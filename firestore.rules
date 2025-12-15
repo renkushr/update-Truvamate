@@ -1,0 +1,63 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Users collection
+    match /users/{userId} {
+      // Anyone can read user profiles
+      allow read: if request.auth != null;
+      // Users can only write to their own profile
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Products collection
+    match /products/{productId} {
+      // Anyone can read products
+      allow read: if true;
+      // Only authenticated sellers can create/update products
+      allow create, update: if request.auth != null;
+      // Only product owner or admin can delete
+      allow delete: if request.auth != null;
+    }
+    
+    // Orders collection
+    match /orders/{orderId} {
+      // Users can read their own orders
+      allow read: if request.auth != null && 
+                   (resource.data.userId == request.auth.uid);
+      // Users can create orders
+      allow create: if request.auth != null;
+      // Only admins can update order status (in production, add admin check)
+      allow update: if request.auth != null;
+    }
+    
+    // Lotto tickets collection
+    match /lotto/{ticketId} {
+      // Users can read their own tickets
+      allow read: if request.auth != null && 
+                   resource.data.userId == request.auth.uid;
+      // Users can create their own tickets
+      allow create: if request.auth != null;
+      // Only admins can update tickets
+      allow update: if request.auth != null;
+    }
+    
+    // Wishlist collection
+    match /wishlist/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Cart collection
+    match /carts/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Site content (CMS)
+    match /site_content/{docId} {
+      // Anyone can read site content
+      allow read: if true;
+      // Only authenticated users can update (in production, add admin check)
+      allow write: if request.auth != null;
+    }
+  }
+}
