@@ -18,7 +18,8 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         },
-        extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json']
+        extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'],
+        preserveSymlinks: false
       },
       build: {
         rollupOptions: {
